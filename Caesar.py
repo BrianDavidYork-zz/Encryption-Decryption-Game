@@ -1,86 +1,75 @@
-"""Contains all the code relating to Caesar encryptions (level 1)."""
 import random
-
-# Defines the alphabet list and number list used to make the dictioniaries for encoding/decoding.
-alph = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
-        'w', 'x', 'y', 'z']
-num = range(0, 26)
-
-# Creates the dictionaries used to encode/decode.
-alph_to_num = dict(zip(alph, num))
-num_to_alph = dict(zip(num, alph))
+from helper import *
 
 
-def caesar_encode(text):
-    """Randomly generates a key and returns a Caesar-encoded version of the string, based on the key."""
-    key = random.randint(1, 25)
+def caesar(mode, text, key=None):
+    """
+    The Caesar Cipher takes a string, and, for each letter in the string, converts the letter to a different one.
+    It does this by associating each letter with a number, and uses the key to get a new numeric value that is then
+    translated back into a new encrypted string.
+
+    For example, if you are encrypting the text 'abc', and your key is 1, the encrypted string would be 'bcd' because
+    a = 0, b = 1, c = 2, d = 3 ... and the key of 1 adds 1 to the number corresponding number of each letter in the
+    text.
+
+    The function takes 3 parameters:
+        1) "mode" tells the function to encrypt (add the key value) or decrypt (subtract the key value)
+        2) "text" is the text to be encrypted or decrypted
+        3) "key" is the numeric key that will be used to decrypt your message.  If you are encrypting, the key is
+            random.
+
+    The dictionaries that convert between letters and numbers are stored in the .helper file, imported above.
+    """
+    mode = mode
+    if mode == 'encrypt':
+        key = random.randint(1, 25)
+    elif mode == 'decrypt':
+        key = key
     str_key = str(key)
     text = text.lower()
-    num_list = [alph_to_num[s] if s in alph else s for s in text]  # converts each letter of the text to a string
-    encoded_list = [num_to_alph[(n + key) % 26] if n in num else n for n in num_list]  # adds key-value to each number
-    encoded_str = ""
-    for i in encoded_list:
-        encoded_str += i
-    print('Your key is ' + str_key)
-    print('The encoded string is: ' + encoded_str)
-
-
-def caesar_decode(text, key):
-    """Takes an encoded string and key, and returns a Caesar-decoded string based on the key provided"""
-    text = text.lower()
+    # converts each letter of the text to a number
     num_list = [alph_to_num[s] if s in alph else s for s in text]
-    decoded_list = [num_to_alph[(n - key) % 26] if n in num else n for n in num_list]
-    decoded_str = ""
-    for i in decoded_list:
-        decoded_str += i
-    print('The decoded text is ' + decoded_str)
+    if mode == 'encrypt':
+        # adds key-value to each number
+        new_list = [num_to_alph[(n + key) % 26] if n in num else n for n in num_list]
+    elif mode == 'decrypt':
+        # subtracts key-value from each number
+        new_list = [num_to_alph[(n - key) % 26] if n in num else n for n in num_list]
+    new_str = ''
+    for i in new_list:
+        new_str += i
+    return new_str, str_key
 
 
-def caesar_test():
-    """randomly chooses a text from list, Caesar-encodes the text, and asks user to decode it to pass the test."""
-    text_list = ['Hello World!',
-                 'God Bless America',
-                 'Welcome to the jungle',
-                 'Meet me by the creek',
-                 'Girls just want to have fun',
-                 'Elephants never forget',
-                 'Big red fire truck',
-                 'I shot a man just to watch him die']
-    ran_str = random.choice(text_list).lower()
-    key = random.randint(1, 25)
-    num_list = [alph_to_num[s] if s in alph else s for s in ran_str]
-    encoded_list = [num_to_alph[(n + key) % 26] if n in num else n for n in num_list]
-    encoded_str = ""
-    for i in encoded_list:
-        encoded_str += i
-    print(encoded_str)
-    answer = input('Can you decode this string? ')
-    if answer.lower() == ran_str.lower():
-        print('Congrats! You solved level 1!\n')
-        pass
-    elif answer != ran_str:
-        print("Sorry, that's not correct.  Why don't you practice some more?\n")
-        caesar()
-
-
-def caesar():
+def caesar_main():
     """Asks user if they want to practice (encode or decode) or take the test, and calls the corresponding function."""
     while True:
         print('Type Q to quit.  Type M to return to the main menu.')
-        prac_test = input('would you like to practice or take the test? P/T')
+        prac_test = input('would you like to practice or take the test? P/T ')
         if prac_test.lower() == 'p':
-            choice = input('Would you like to encode or decode? E/D ')
+            choice = input('Would you like to encrypt or decrypt? E/D ')
             if choice.lower() == 'e':
-                s = input('Enter the text you would like to encode: ')
-                caesar_encode(s)
+                text = input('Enter the text you would like to encode: ')
+                message = caesar('encrypt', text)
+                print('Your encrypted text is ' + message[0])
             elif choice.lower() == 'd':
-                s = input('Enter the text you would like to decode: ')
-                k = int(input('Enter the key: '))
-                caesar_decode(s, k)
+                text = input('Enter the text you would like to decode: ')
+                key = int(input('Enter the key: '))
+                message = caesar('decrypt', text, key)
+                print('Your decrypted text is ' + message[0])
             else:
                 print('You must enter either "E" or "D" to encode or decode a text. ')
         elif prac_test.lower() == 't':
-            caesar_test()
+            text = random.choice(text_list)
+            encrypted_text = caesar('encrypt', text)
+            print(encrypted_text[0])
+            answer = input('s/nCan you decode this string? ')
+            if answer.lower() == text.lower():
+                print('Congrats! You solved level 2!\n')
+                break
+            elif answer.lower() != text.lower():
+                print("Sorry, that's not correct.  Why don't you practice some more?\n")
+                caesar_main()
         elif prac_test.lower() == 'q':
             exit()
         elif prac_test.lower() == 'm':

@@ -1,147 +1,89 @@
-"""Contains all the code relating to Vigenere encryptions (level 2)."""
 import random
 import itertools
-
-# Defines the alphabet list and number list used to make the dictionaries for encoding/decoding.
-alph = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
-        'w', 'x', 'y', 'z']
-num = range(0, 26)
-
-# Creates the dictionaries used to encode/decode.
-alph_to_num = dict(zip(alph, num))
-num_to_alph = dict(zip(num, alph))
+from helper import *
 
 
-def vigenere_encode(text):
-    """Randomly generates a key and returns a Vigenere-encoded version of the string, based on the key."""
+def vigenere(mode, text, key=None):
+    """
+    The Vigenere function takes a text and either encrypts or decrypts it according to the key word provided.  The
+    function works like the Caesar function, except instead of changing every letter of the text by the same increment,
+    it uses a key-word changed into a series of numbers that is then applied to the text.
+
+    For example, if you are encrypting the text 'abc', and your key is 'bad', the encrypted string would be 'bbf'
+    because a = 0, b = 1, c = 2, d = 3 ... and the key of 'bad' adds the series of numbers (1, 0, 3) to  to the text
+    translated into numbers (0, 1, 2), which adds up to (1, 1, 5) or 'bbf'.
+
+    The function takes 3 parameters:
+        1) "mode" tells the function to encrypt (add the key value) or decrypt (subtract the key value)
+        2) "text" is the string to be encrypted or decrypted
+        3) "key" is the string that will be used to decrypt your message.  If you are encrypting, the key is random.
+
+    The dictionaries that convert between letters and numbers are stored in the .helper file, imported above.
+    """
+    mode = mode
     text = text.lower()
-    key = random.choice([
-            'lemon',
-            'apple',
-            'pear',
-            'banana',
-            'peach',
-            'strawberry',
-            'goji',
-            'kiwi',
-            'lime',
-            'tomato',
-            'melon'])
-    k = itertools.cycle(key)
+    if mode == 'encrypt':
+        key = random.choice(cipher_key)
+    elif mode == 'decrypt':
+        key = key
+    k = itertools.cycle(key)  # creates an infinite iteration over the key
     key_list = []
-    encoded_list = []
+    new_list = []
+    # creates a list as long as the text from the variable k
     i = 1
     while i <= len(text):
         key_list.append(next(k))
         i += 1
+    # converts each letter of the text to a number
     num_list = [alph_to_num[s] if s in alph else s for s in text]
-    num_key_list = [alph_to_num[s] if s in alph else s for s in key_list]
-    for num1, num2 in zip(num_list, num_key_list):
-        if num1 in num:
-            encoded_list.append(num1 + num2)
-        else:
-            encoded_list.append(num1)
-    encoded_list = [num_to_alph[n % 26] if isinstance(n, int) else n for n in encoded_list]
-    encoded_str = ""
-    for i in encoded_list:
-        encoded_str += i
-    print('Your key is: ' + key)
-    print('The encoded string is: ' + encoded_str)
-
-
-def vigenere_decode(text, key):
-    """Takes an encoded string and key, and returns a Vigenere-decoded string based on the key provided"""
-    text = text.lower()
-    k = itertools.cycle(key)
-    key_list = []
-    decoded_list = []
-    i = 1
-    while i <= len(text):
-        key_list.append(next(k))
-        i += 1
-    num_list = [alph_to_num[s] if s in alph else s for s in text]
+    # converts each letter of the string in the variable key_list to a number
     num_key_list = [alph_to_num[s] for s in key_list]
     for num1, num2 in zip(num_list, num_key_list):
         if num1 in num:
-            decoded_list.append(num1 - num2)
+            if mode == 'encrypt':
+                # adds the numeric values of the text and key together
+                new_list.append(num1 + num2)
+            elif mode == 'decrypt':
+                # subtracts the numeric values of the text and key together
+                new_list.append(num1 - num2)
         else:
-            decoded_list.append(num1)
-    decoded_list = [num_to_alph[n % 26] if isinstance(n, int) else n for n in decoded_list]
-    decoded_str = ""
+            new_list.append(num1)
+    decoded_list = [num_to_alph[n % 26] if isinstance(n, int) else n for n in new_list]
+    new_str = ""
     for i in decoded_list:
-        decoded_str += i
-    print('Your decoded text is: ' + decoded_str)
+        new_str += i
+    return new_str
 
 
-def vigenere_test():
-    """randomly chooses a text from list, Vigenere-encodes the text, and asks user to decode it to pass the test."""
-    text_list = [
-                 'Hello World!',
-                 'God Bless America',
-                 'Welcome to the jungle',
-                 'Meet me by the creek',
-                 'Girls just want to have fun',
-                 'Elephants never forget',
-                 'Big red fire truck',
-                 'I shot a man just to watch him die']
-    ran_str = random.choice(text_list).lower()
-    key = random.choice([
-                'red',
-                'blue',
-                'green',
-                'yellow',
-                'orange',
-                'violet',
-                'purple',
-                'white',
-                'black'])
-    k = itertools.cycle(key)
-    key_list = []
-    encoded_list = []
-    i = 1
-    while i <= len(text):
-        key_list.append(next(k))
-        i += 1
-    num_list = [alph_to_num[s] if s in alph else s for s in ran_str]
-    num_key_list = [alph_to_num[s] if s in alph else s for s in key_list]
-    for num1, num2 in zip(num_list, num_key_list):
-        if num1 in num:
-            encoded_list.append(num1 + num2)
-        else:
-            encoded_list.append(num1)
-    encoded_list = [num_to_alph[n % 26] if isinstance(n, int) else n for n in encoded_list]
-    encoded_str = ""
-    for i in encoded_list:
-        encoded_str += i
-    print(encoded_str)
-    answer = input('Can you decode this string?\n '
-                   'Hint: the key is ' + str(len(key)) + ' letters long.')
-    if answer.lower() == ran_str.lower():
-        print('Congrats! You solved level 2!\n')
-        pass
-    elif answer != ran_str:
-        print("Sorry, that's not correct.  Why don't you practice some more?\n")
-        vigenere()
-
-
-def vigenere():
+def vigenere_main():
     """Asks user if they want to practice (encode or decode) or take the test, and calls the corresponding function."""
     while True:
         print('Type Q to quit.  Type M to return to the main menu.')
-        prac_test = input('would you like to practice or take the test? P/T')
+        prac_test = input('would you like to practice or take the test? P/T ')
         if prac_test.lower() == 'p':
-            choice = input('Would you like to encode or decode? E/D ')
+            choice = input('Would you like to encrypt or decrypt? E/D ')
             if choice.lower() == 'e':
-                s = input('Enter the text you would like to encode: ')
-                vigenere_encode(s)
+                text = input('Enter the text you would like to encode: ')
+                message = vigenere('encrypt', text)
+                print('Your encrypted text is ' + message)
             elif choice.lower() == 'd':
-                s = input('Enter the text you would like to decode: ')
-                k = input('Enter the key: ')
-                vigenere_decode(s, k)
+                text = input('Enter the text you would like to decode: ')
+                key = input('Enter the key: ')
+                message = vigenere('decrypt', text, key)
+                print('Your decrypted text is ' + message)
             else:
                 print('You must enter either "E" or "D" to encode or decode a text. ')
         elif prac_test.lower() == 't':
-            vigenere_test()
+            text = random.choice(text_list)
+            encrypted_text = vigenere('encrypt', text)
+            print(encrypted_text)
+            answer = input('s/nCan you decode this string? ')
+            if answer.lower() == text.lower():
+                print('Congrats! You solved level 3!\n')
+                break
+            elif answer.lower() != text.lower():
+                print("Sorry, that's not correct.  Why don't you practice some more?\n")
+                vigenere_main()
         elif prac_test.lower() == 'q':
             exit()
         elif prac_test.lower() == 'm':
