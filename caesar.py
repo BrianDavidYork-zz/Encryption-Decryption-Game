@@ -7,17 +7,14 @@ def caesar(mode, text, key=None):
     The Caesar Cipher takes a string, and, for each letter in the string, converts the letter to a different one.
     It does this by associating each letter with a number, and uses the key to get a new numeric value that is then
     translated back into a new encrypted string.
-
     For example, if you are encrypting the text 'abc', and your key is 1, the encrypted string would be 'bcd' because
     a = 0, b = 1, c = 2, d = 3 ... and the key of 1 adds 1 to the number corresponding number of each letter in the
     text.
-
     The function takes 3 parameters:
         1) "mode" tells the function to encrypt (add the key value) or decrypt (subtract the key value)
         2) "text" is the text to be encrypted or decrypted
         3) "key" is the numeric key that will be used to decrypt your message.  If you are encrypting, the key is
             random.
-
     The dictionaries that convert between letters and numbers are stored in the .helper file, imported above.
     """
     mode = mode
