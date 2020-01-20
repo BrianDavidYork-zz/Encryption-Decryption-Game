@@ -15,7 +15,7 @@ def main():
           "After that, you can take a test to prove that you are a master cryptographer!\n")
 
     while True:
-        level = input("Enter 1, 2, 3, or 4 to select a difficulty level, or enter Q to quit. ")
+        level = str(input("Enter 1, 2, 3, or 4 to select a difficulty level, or enter Q to quit. "))
         if level == '1':
             reverse_main()
         elif level == '2':
